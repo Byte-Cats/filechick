@@ -4,7 +4,7 @@
 # filechick ![chick](https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/320/sony/336/baby-chick_1f424.png)
 
 <div/>
-
+<div align="left">
 ### useful functions to do "stuff" with files
 Stuff:
 - Create a file
@@ -17,3 +17,5 @@ Stuff:
 
 
 # powered by [![afero](https://cloud.githubusercontent.com/assets/173412/11490338/d50e16dc-97a5-11e5-8b12-019a300d0fcb.png)](https://github.com/spf13/afero)
+
+  </div> 
