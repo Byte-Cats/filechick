@@ -5,9 +5,10 @@
 
 <div/>
  
-<div align="left">
+
   
 ### useful functions to do "stuff" with files
+
 Stuff:
 - Create a file
 - Delete a file
@@ -20,4 +21,3 @@ Stuff:
 
 # powered by [![afero](https://cloud.githubusercontent.com/assets/173412/11490338/d50e16dc-97a5-11e5-8b12-019a300d0fcb.png)](https://github.com/spf13/afero)
 
-  </div> 
