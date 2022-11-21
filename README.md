@@ -12,7 +12,7 @@
 ### Stuff:
 - Create a file
 - Delete a file
-- Create a direactory
+- Create a directory
 - Get list of filenames in a directory
 
 
