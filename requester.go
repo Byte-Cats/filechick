@@ -3,7 +3,6 @@ package filechick
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 )
 
@@ -34,7 +33,7 @@ func CustomRequest(url string) (string, error) {
 			fmt.Println("Error closing body:", err)
 		}
 	}(resp.Body)
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return "Error reading body:", err
 	}
