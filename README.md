@@ -1,6 +1,7 @@
 ![file](https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/320/au-kddi/196/file-folder_1f4c1.gif) 
 # filechick ![chick](https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/320/sony/336/baby-chick_1f424.png)
-useful functions to do "stuff" with files
+### useful functions to do "stuff" with files
+Stuff:
 - Create a file
 - Delete a file
 - Create a direactory
