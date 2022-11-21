@@ -9,7 +9,7 @@
   
 ### useful functions to do "stuff" with files
 
-Stuff:
+### Stuff:
 - Create a file
 - Delete a file
 - Create a direactory
