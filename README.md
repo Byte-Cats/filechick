@@ -9,7 +9,7 @@
   
 ### useful functions to do "stuff" with files
 
-### Stuff:
+## Stuff:
 ### Checking
 - Get list of filenames in a directory
 ### Creating
