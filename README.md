@@ -10,15 +10,20 @@
 ### useful functions to do "stuff" with files
 
 ### Stuff:
+### Checking
+- Get list of filenames in a directory
+### Creating
 - Create a file
 - Name a file
 - Delete a file
 - Create a directory
-- Name a directory 
+- Name a directory
+# URL to local file 
 - Download results of a http/s get to url
 - Write Url response to a file (html)
-- Get list of filenames in a directory
-- Deleting files by name
+### Deleting
+- Delete files by name
+- Delete directories by name
 
 
 ![mascot](https://imgs.search.brave.com/tz25U7pzyDtZF406hB1DoJLLy6eyB6vg_XDD6kkxYQM/rs:fit:1200:1200:1/g:ce/aHR0cHM6Ly9pLnBp/bmltZy5jb20vb3Jp/Z2luYWxzLzE1LzZl/LzZmLzE1NmU2ZjZm/YTFiOGU4MmY0YzRj/NGNjM2JkNzM5NzNh/LnBuZw)
