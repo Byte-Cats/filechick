@@ -11,8 +11,12 @@
 
 ### Stuff:
 - Create a file
+- Name a file
 - Delete a file
 - Create a directory
+- Name a directory 
+- Download results of a http/s get to url
+- Write Url response to a file (html)
 - Get list of filenames in a directory
 
 
