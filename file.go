@@ -104,9 +104,7 @@ func ExitIfExists(dir string) {
 // SaveImage to file
 func SaveImage(url string, filename string) {
 
-	// fmt.Println("got page for filename:", filename)
 	// filename = strings.Replace(filename, ".png", ".jpg", -1)
-	// fmt.Println("Image being written to file location: " + filename)
 
 	results, _ := http.Get(url)
 	defer func(Body io.ReadCloser) {
