@@ -3,11 +3,13 @@ package filechick
 import (
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"regexp"
 
 	"github.com/spf13/afero"
+	"github.com/spf13/viper"
 )
 
 var Afero = afero.Afero{Fs: afero.NewOsFs()}
@@ -155,4 +157,21 @@ func GetFileNames(dir string) ([]string, error) {
 		fileNames = append(fileNames, file.Name())
 	}
 	return fileNames, nil
+}
+
+// VippyEnv to get environment variable
+func VippyEnv(key string) string {
+	// use viper to get bot key from environment variable
+	vippy := viper.New()
+	vippy.SetConfigName(".env")
+	vippy.SetConfigType("env")
+	vippy.AddConfigPath(".")
+	vippy.AllowEmptyEnv(false)
+	vippy.AutomaticEnv()
+	err := vippy.ReadInConfig()
+	if err != nil {
+		log.Fatal("Error reading env file: ", err)
+	}
+	key = vippy.GetString(key)
+	return key
 }
