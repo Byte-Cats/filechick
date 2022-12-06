@@ -1,4 +1,8 @@
 package filechick 
+import (
+	"fmt"
+	"strconv"
+)
 
 // StringToInt to change string to int
 func StringToInt(str string) int {
