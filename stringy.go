@@ -14,3 +14,17 @@ func StringToInt(str string) int {
 	}
 	return i
 }
+
+// FormatString formats the input string to be more readable for a Discord message.
+func FormatString(input string) string {
+	// Replace newlines with line breaks.
+	formatted := strings.ReplaceAll(input, "\n", "\n\n")
+
+	// Add a space after each period.
+	formatted = strings.ReplaceAll(formatted, ".", ".\n")
+
+	// Add a space after each comma.
+	formatted = strings.ReplaceAll(formatted, ",", ", ")
+
+	return formatted
+}
