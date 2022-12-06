@@ -2,6 +2,7 @@ package filechick
 import (
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 // StringToInt to change string to int
