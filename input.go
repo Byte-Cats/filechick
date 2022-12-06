@@ -2,9 +2,7 @@ package filechick
 
 import (
 	"bufio"
-	"fmt"
 	"os"
-	"strconv"
 	"strings"
 )
 
