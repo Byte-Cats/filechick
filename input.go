@@ -2,6 +2,7 @@ package filechick
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"strings"
 )
