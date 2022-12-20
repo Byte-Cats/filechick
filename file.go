@@ -1,6 +1,7 @@
 package filechick
 
 import (
+	"bufio"
 	"fmt"
 	"io"
 	"log"
@@ -155,6 +156,52 @@ func GetFileNames(dir string) ([]string, error) {
 		fileNames = append(fileNames, file.Name())
 	}
 	return fileNames, nil
+}
+
+// FileOrDirExists checks if a file or directory exists
+func FileOrDirExists(path string) bool {
+	_, err := os.Stat(path)
+	return err == nil
+}
+
+// CopyFile copies a file
+func CopyFile(src, dst string) error {
+	in, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer in.Close()
+
+	out, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	_, err = io.Copy(out, in)
+	if err != nil {
+		return err
+	}
+	return out.Close()
+}
+
+// ReadFileLineByLine reads a file line by line
+func ReadFileLineByLine(filePath string) ([]string, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	var lines []string
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+	if err := scanner.Err(); err != nil {
+		return nil, err
+	}
+	return lines, nil
 }
 
 // VippyEnv to get environment variable
