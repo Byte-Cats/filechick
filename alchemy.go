@@ -12,7 +12,7 @@ import (
 	"gonum.org/v1/plot/vg"
 
 	"github.com/skip2/go-qrcode"
-	"github.com/pdfcpu/pdfcpu/pkg/api"
+	pdfcpuAPI "github.com/pdfcpu/pdfcpu/pkg/api"
 	"github.com/kkroening/ffmpeg-go"
 )
 
