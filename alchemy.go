@@ -1,6 +1,20 @@
 package filechick
 
-import "github.com/skip2/go-qrcode"
+import (
+	"fmt"
+	"math/rand"
+	"image/color"
+	"strings"
+	"time"
+	
+	"gonum.org/v1/plot"
+	"gonum.org/v1/plot/plotter"
+	"gonum.org/v1/plot/vg"
+
+	"github.com/skip2/go-qrcode"
+	"github.com/pdfcpu/pdfcpu/pkg/api"
+	"github.com/kkroening/ffmpeg-go"
+)
 
 // GenerateQR generates a QR code with the given size, filename and content
 func GenerateQR(size int, filename string, content string) {
@@ -79,6 +93,35 @@ func GeneratePassword(length int, chars string) string {
 	return sb.String()
 }
 
+
+// GenerateName generates a random business name with the specified length and set of allowed characters.
+// length is the length of the generated business name.
+// chars is a string containing all the characters that are allowed in the generated business name.
+// Returns the generated business name.
+func GenerateName(length int, chars string) string {
+	// Seed the random number generator.
+	rand.Seed(time.Now().UnixNano())
+
+	// Initialize a string builder with a capacity of length.
+	sb := strings.Builder{}
+	sb.Grow(length)
+
+	// Generate length random characters from the chars string.
+	for i := 0; i < length; i++ {
+		// Generate a random index into the chars string.
+		idx := rand.Intn(len(chars))
+
+		// Append the character at the generated index to the string builder.
+		sb.WriteByte(chars[idx])
+	}
+
+	// Convert the first character of the resulting string to uppercase.
+	name := strings.Title(sb.String())
+
+	// Return the resulting business name.
+	return name
+}
+
 // ConvertPDFToWord converts a PDF file to a Word document.
 // inputFilePath is the path of the PDF file.
 // outputFilePath is the path of the Word document.
@@ -95,3 +138,81 @@ func ConvertWordToPDF(inputFilePath string, outputFilePath string) error {
 	return pdfcpuAPI.Convert(inputFilePath, outputFilePath)
 }
 
+
+// ConvertAudio converts an audio file to another audio format.
+// inputFile is the path of the input audio file.
+// outputFile is the path of the output audio file.
+// format is the output audio format (e.g., mp3, wav).
+// Returns an error if one occurs during conversion.
+func ConvertAudio(inputFile string, outputFile string, format string) error {
+	// Open the input audio file.
+	in, err := os.Open(inputFile)
+	if err != nil {
+		return fmt.Errorf("error opening input file: %v", err)
+	}
+	defer in.Close()
+
+	// Create the output audio file.
+	out, err := os.Create(outputFile)
+	if err != nil {
+		return fmt.Errorf("error creating output file: %v", err)
+	}
+	defer out.Close()
+
+	// Set up the ffmpeg command.
+	cmd := ffmpeg.New()
+
+	// Set the input file.
+	cmd.Input(in)
+
+	// Set the output file.
+	cmd.Output(out)
+
+	// Set the output audio format.
+	cmd.AudioCodec("libmp3lame")
+	cmd.Format(format)
+
+// Run the ffmpeg command.
+if err := cmd.Run(); err != nil {
+    return fmt.Errorf("error running ffmpeg command: %v", err)
+}
+
+return nil
+
+}
+
+// SaveBarChart generates a bar chart from a slice of data and saves it to a file.
+// data is the slice of data to chart.
+// labels is a slice of labels for the data.
+// filename is the path of the file to save the chart to.
+// Returns an error if one occurs during chart generation.
+func SaveBarChart(data []float64, labels []string, filename string) error {
+	// Create a new bar chart.
+	p, err := plot.New()
+	if err != nil {
+		return fmt.Errorf("error creating bar chart: %v", err)
+	}
+
+	// Set the chart title and axis labels.
+	p.Title.Text = "Data"
+	p.Y.Label.Text = "Value"
+	p.X.Label.Text = "Label"
+
+	// Create a bar chart from the data.
+	barData, err := plotter.NewBarChart(plotter.Values(data), vg.Points(10))
+	if err != nil {
+		return fmt.Errorf("error creating bar chart data: %v", err)
+	}
+	barData.Color = color.RGBA{R: 96, G: 187, B: 105, A: 255}
+	barData.Labels = labels
+
+	// Add the bar chart to the plot.
+	p.Add(barData)
+
+	// Save the chart to a file.
+	if err := p.Save(4*vg.Inch, 4*vg.Inch, filename); err != nil {
+		return fmt.Errorf("error saving bar chart: %v", err)
+	}
+
+	return nil
+}
