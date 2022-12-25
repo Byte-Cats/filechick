@@ -13,7 +13,7 @@ import (
 
 	"github.com/skip2/go-qrcode"
 	pdfcpuAPI "github.com/pdfcpu/pdfcpu/pkg/api"
-	"github.com/14rcole/goplay/pkg/ffmpeg")
+	)
 
 // GenerateQR generates a QR code with the given size, filename and content
 func GenerateQR(size int, filename string, content string) {
@@ -137,48 +137,6 @@ func ConvertWordToPDF(inputFilePath string, outputFilePath string) error {
 	return pdfcpuAPI.Convert(inputFilePath, outputFilePath)
 }
 
-
-// ConvertAudio converts an audio file to another audio format.
-// inputFile is the path of the input audio file.
-// outputFile is the path of the output audio file.
-// format is the output audio format (e.g., mp3, wav).
-// Returns an error if one occurs during conversion.
-func ConvertAudio(inputFile string, outputFile string, format string) error {
-	// Open the input audio file.
-	in, err := os.Open(inputFile)
-	if err != nil {
-		return fmt.Errorf("error opening input file: %v", err)
-	}
-	defer in.Close()
-
-	// Create the output audio file.
-	out, err := os.Create(outputFile)
-	if err != nil {
-		return fmt.Errorf("error creating output file: %v", err)
-	}
-	defer out.Close()
-
-	// Set up the ffmpeg command.
-	cmd := ffmpeg.New()
-
-	// Set the input file.
-	cmd.Input(in)
-
-	// Set the output file.
-	cmd.Output(out)
-
-	// Set the output audio format.
-	cmd.AudioCodec("libmp3lame")
-	cmd.Format(format)
-
-// Run the ffmpeg command.
-if err := cmd.Run(); err != nil {
-    return fmt.Errorf("error running ffmpeg command: %v", err)
-}
-
-return nil
-
-}
 
 // SaveBarChart generates a bar chart from a slice of data and saves it to a file.
 // data is the slice of data to chart.
