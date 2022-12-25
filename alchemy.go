@@ -54,6 +54,30 @@ func contains(s []int, e int) bool {
 	return false
 }
 
+// GeneratePassword generates a random password with the specified length and set of allowed characters.
+// length is the length of the generated password.
+// chars is a string containing all the characters that are allowed in the generated password.
+// Returns the generated password.
+func GeneratePassword(length int, chars string) string {
+	// Seed the random number generator.
+	rand.Seed(time.Now().UnixNano())
+
+	// Initialize a string builder with a capacity of length.
+	sb := strings.Builder{}
+	sb.Grow(length)
+
+	// Generate length random characters from the chars string.
+	for i := 0; i < length; i++ {
+		// Generate a random index into the chars string.
+		idx := rand.Intn(len(chars))
+
+		// Append the character at the generated index to the string builder.
+		sb.WriteByte(chars[idx])
+	}
+
+	// Return the resulting string.
+	return sb.String()
+}
 
 // ConvertPDFToWord converts a PDF file to a Word document.
 // inputFilePath is the path of the PDF file.
