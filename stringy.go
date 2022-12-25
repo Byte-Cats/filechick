@@ -4,6 +4,7 @@ import (
 	"strconv"
 	"strings"
 	"unicode"
+	"time"
 )
 
 // StringToInt converts a string to an int
@@ -33,6 +34,13 @@ func RemoveWords(s string, words []string) string {
 	return s
 }
 
+func printMessage(message string, delay time.Duration) {
+    for _, character := range message {
+        fmt.Printf("\r%s", string(character))
+        time.Sleep(delay)
+    }
+    fmt.Println()
+}
 // RemoveWord removes a word from a string
 func RemoveWord(s string, word string) string {
 	return strings.Replace(s, word, "", -1)
