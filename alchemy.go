@@ -3,17 +3,14 @@ package filechick
 import (
 	"fmt"
 	"math/rand"
-	"image/color"
+	"os"
 	"strings"
 	"time"
-	
-	"gonum.org/v1/plot"
-	"gonum.org/v1/plot/plotter"
-	"gonum.org/v1/plot/vg"
+
+	chart "github.com/wcharczuk/go-chart"
 
 	"github.com/skip2/go-qrcode"
-	pdfcpuAPI "github.com/pdfcpu/pdfcpu/pkg/api"
-	)
+)
 
 // GenerateQR generates a QR code with the given size, filename and content
 func GenerateQR(size int, filename string, content string) {
@@ -92,7 +89,6 @@ func GeneratePassword(length int, chars string) string {
 	return sb.String()
 }
 
-
 // GenerateName generates a random business name with the specified length and set of allowed characters.
 // length is the length of the generated business name.
 // chars is a string containing all the characters that are allowed in the generated business name.
@@ -125,51 +121,49 @@ func GenerateName(length int, chars string) string {
 // inputFilePath is the path of the PDF file.
 // outputFilePath is the path of the Word document.
 // Returns an error if one occurs during conversion.
-func ConvertPDFToWord(inputFilePath string, outputFilePath string) error {
-	return pdfcpuAPI.Convert(inputFilePath, outputFilePath)
-}
+//func ConvertPDFToWord(inputFilePath string, outputFilePath string) error {
+//	return pdfcpu.Convert(inputFilePath, outputFilePath)
+//}
 
 // ConvertWordToPDF converts a Word document to a PDF file.
 // inputFilePath is the path of the Word document.
 // outputFilePath is the path of the PDF file.
 // Returns an error if one occurs during conversion.
-func ConvertWordToPDF(inputFilePath string, outputFilePath string) error {
-	return pdfcpuAPI.Convert(inputFilePath, outputFilePath)
-}
+//func ConvertWordToPDF(inputFilePath string, outputFilePath string) error {
+//	return pdfcpu.Convert(inputFilePath, outputFilePath)
+//}
 
-
-// SaveBarChart generates a bar chart from a slice of data and saves it to a file.
-// data is the slice of data to chart.
-// labels is a slice of labels for the data.
-// filename is the path of the file to save the chart to.
-// Returns an error if one occurs during chart generation.
-func SaveBarChart(data []float64, labels []string, filename string) error {
+// MakeBarChart creates a simple bar chart with the given data and renders it to the given file.
+// data is a slice of x-y pairs representing the data to be plotted.
+// file is the path of the file to save the chart to.
+// title is the title of the chart.
+// xLabel is the label for the x-axis.
+// yLabel is the label for the y-axis.
+func MakeBarChart(data []chart.Value, file string, title string, xLabel string, yLabel string) {
 	// Create a new bar chart.
-	p, err := plot.New()
+	barChart := chart.BarChart{
+		Title:      title,
+		TitleStyle: chart.StyleShow(),
+		Background: chart.Style{
+			Padding: chart.Box{
+				Top: 40,
+			},
+		},
+		Bars: data,
+	}
+
+	// Set the width and height of the chart.
+	barChart.Width = 640
+	barChart.Height = 480
+
+	// Create a file to save the chart to.
+	f, err := os.Create(file)
 	if err != nil {
-		return fmt.Errorf("error creating bar chart: %v", err)
+		fmt.Println(err)
+		return
 	}
+	defer f.Close()
 
-	// Set the chart title and axis labels.
-	p.Title.Text = "Data"
-	p.Y.Label.Text = "Value"
-	p.X.Label.Text = "Label"
-
-	// Create a bar chart from the data.
-	barData, err := plotter.NewBarChart(plotter.Values(data), vg.Points(10))
-	if err != nil {
-		return fmt.Errorf("error creating bar chart data: %v", err)
-	}
-	barData.Color = color.RGBA{R: 96, G: 187, B: 105, A: 255}
-	barData.Labels = labels
-
-	// Add the bar chart to the plot.
-	p.Add(barData)
-
-	// Save the chart to a file.
-	if err := p.Save(4*vg.Inch, 4*vg.Inch, filename); err != nil {
-		return fmt.Errorf("error saving bar chart: %v", err)
-	}
-
-	return nil
+	// Render the chart to the file in PNG format.
+	barChart.Render(chart.PNG, f)
 }
