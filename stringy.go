@@ -34,13 +34,18 @@ func RemoveWords(s string, words []string) string {
 	return s
 }
 
-func printMessage(message string, delay time.Duration) {
+// PrintCharMessage prints a given string character by character with a given delay time between each character.
+// This is useful for displaying a message in an animated way. 
+// message: The string message that needs to be printed.
+// delay: The delay time between each character in milliseconds. 
+func PrintCharMessage(message string, delay time.Duration) {
     for _, character := range message {
         fmt.Printf("\r%s", string(character))
         time.Sleep(delay)
     }
     fmt.Println()
 }
+
 // RemoveWord removes a word from a string
 func RemoveWord(s string, word string) string {
 	return strings.Replace(s, word, "", -1)
