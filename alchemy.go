@@ -13,8 +13,7 @@ import (
 
 	"github.com/skip2/go-qrcode"
 	pdfcpuAPI "github.com/pdfcpu/pdfcpu/pkg/api"
-	"github.com/kkroening/ffmpeg-go"
-)
+	"github.com/14rcole/goplay/pkg/ffmpeg")
 
 // GenerateQR generates a QR code with the given size, filename and content
 func GenerateQR(size int, filename string, content string) {
