@@ -97,7 +97,7 @@ func NewDir(dir string) {
 // ExitIfExists exits the program if the file already exists
 func ExitIfExists(dir string) {
 	if _, err := os.Stat(dir); !os.IsNotExist(err) {
-		fmt.Println("Manga-G detected that you already have this manga downloaded. Exiting...")
+		fmt.Println("Filechick detected that you already have this file downloaded. Exiting...")
 		os.Exit(0)
 	}
 }
