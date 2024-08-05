@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"regexp"
 
 	"github.com/spf13/afero"
@@ -154,7 +155,7 @@ func SaveImage(url string, filename string) error {
 // TitleToDirName converts a title to a directory name.
 // Returns the directory name as a string.
 func TitleToDirName(title string) string {
-	reg, _ := regexp.Compile("[^a-zA-Z\\d]+")
+	reg := regexp.MustCompile(`[^a-zA-Z\d]+`) // Changed to raw string
 	return reg.ReplaceAllString(title, "")
 }
 
@@ -255,4 +256,70 @@ func VippyEnv(key string) string {
 		log.Fatal("Error reading env file: ", err)
 	}
 	return vippy.GetString(key)
+}
+
+// RenameFile renames a file from oldName to newName.
+// Returns an error if the operation fails.
+func RenameFile(oldName string, newName string) error {
+	err := os.Rename(oldName, newName)
+	if err != nil {
+		return fmt.Errorf("error renaming file: %w", err)
+	}
+	return nil
+}
+
+// MoveFile moves a file from src to dst.
+// Returns an error if the operation fails.
+func MoveFile(src string, dst string) error {
+	err := os.Rename(src, dst)
+	if err != nil {
+		return fmt.Errorf("error moving file: %w", err)
+	}
+	return nil
+}
+
+// CopyDirectory copies all files from srcDir to dstDir.
+// Returns an error if the operation fails.
+func CopyDirectory(srcDir string, dstDir string) error {
+	entries, err := os.ReadDir(srcDir)
+	if err != nil {
+		return fmt.Errorf("error reading source directory: %w", err)
+	}
+
+	for _, entry := range entries {
+		srcPath := filepath.Join(srcDir, entry.Name())
+		dstPath := filepath.Join(dstDir, entry.Name())
+
+		if entry.IsDir() {
+			err = os.MkdirAll(dstPath, os.ModePerm)
+			if err != nil {
+				return fmt.Errorf("error creating directory: %w", err)
+			}
+			err = CopyDirectory(srcPath, dstPath)
+			if err != nil {
+				return err
+			}
+		} else {
+			err = CopyFile(srcPath, dstPath)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+// ListFiles lists all files in the specified directory.
+// Returns a slice of file names and an error if any.
+func ListFiles(dir string) ([]string, error) {
+	files, err := os.ReadDir(dir)
+	if err != nil {
+		return nil, fmt.Errorf("error reading directory: %w", err)
+	}
+
+	var fileNames []string
+	for _, file := range files {
+		fileNames = append(fileNames, file.Name())
+	}
+	return fileNames, nil
 }
