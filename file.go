@@ -15,7 +15,8 @@ import (
 
 var Afero = afero.Afero{Fs: afero.NewOsFs()}
 
-// CreateEmptyFile a function to create an empty file
+// CreateEmptyFile creates an empty file.
+// Returns the file pointer and an error if any.
 func CreateEmptyFile(fileName string) (*os.File, error) {
 	file, err := os.Create(fileName)
 	if err != nil {
@@ -24,36 +25,47 @@ func CreateEmptyFile(fileName string) (*os.File, error) {
 	return file, nil
 }
 
-// DeleteFile function to delete os file
-func DeleteFile(file string) {
+// DeleteFile deletes the specified file.
+// Returns an error if the operation fails.
+func DeleteFile(file string) error {
 	err := os.RemoveAll(file)
 	if err != nil {
-		fmt.Println(err)
+		return fmt.Errorf("error deleting file: %w", err)
 	}
+	return nil
 }
 
-// SaveHtml save html to file
-func SaveHtml(url string, fileName string) {
-	// get the html from the url
+// SaveHtml saves HTML content from a URL to a specified file.
+// Returns an error if the operation fails.
+func SaveHtml(url string, fileName string) error {
+	// Validate URL
+	if _, err := url.ParseRequestURI(url); err != nil {
+		return fmt.Errorf("invalid URL: %w", err)
+	}
 
-	// save it to a file
-	file := CreateFile(fileName)
-	// turn result into a string
-	// write the string to the file
+	// Create the file
+	file, err := CreateFile(fileName)
+	if err != nil {
+		return fmt.Errorf("error creating file: %w", err)
+	}
+	defer file.Close()
+
+	// Get HTML content
 	res, reqErr := CustomRequest(url)
 	if reqErr != nil {
-		fmt.Println("Error getting html from url", reqErr)
-		return
+		return fmt.Errorf("error getting HTML from URL: %w", reqErr)
 	}
-	_, fileErr := file.WriteString(res)
 
-	if fileErr != nil {
-		fmt.Println("Error writing to file", fileErr)
-		return
+	// Write to file
+	if _, fileErr := file.WriteString(res); fileErr != nil {
+		return fmt.Errorf("error writing to file: %w", fileErr)
 	}
+
+	return nil
 }
 
-// CreateFile creates a file
+// CreateFile creates a file.
+// Returns the file pointer and an error if any.
 func CreateFile(fileName string) *os.File {
 	file, err := os.Create(fileName)
 	if err != nil {
@@ -63,38 +75,42 @@ func CreateFile(fileName string) *os.File {
 	return file
 }
 
-// LoadHtml load html from file to string
-func LoadHtml(file string) string {
-	// open the file
+// LoadHtml loads HTML content from a file to a string.
+// Returns the HTML content as a string and an error if any.
+func LoadHtml(file string) (string, error) {
+	// Open the file
 	f, err := os.Open(file)
 	if err != nil {
-		fmt.Println("Error opening file", err)
-		return ""
+		return "", fmt.Errorf("error opening file: %w", err)
 	}
-	// read the file
+	defer f.Close()
+
+	// Read the file
 	bytes, err2 := io.ReadAll(f)
 	if err2 != nil {
-		fmt.Println("Error reading file", err2)
-		return ""
+		return "", fmt.Errorf("error reading file: %w", err2)
 	}
-	// turn result into a string
-	return string(bytes)
+
+	// Turn result into a string
+	return string(bytes), nil
 }
 
-// NewDir creates a new directory
-func NewDir(dir string) {
-	// if directory doesn't exist, create it
+// NewDir creates a new directory.
+// Returns an error if the operation fails.
+func NewDir(dir string) error {
+	// If directory doesn't exist, create it
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
 		err := os.Mkdir(dir, 0755)
 		if err != nil {
-			fmt.Println("Error creating directory: " + err.Error())
+			return fmt.Errorf("error creating directory: %w", err)
 		}
 	} else if err != nil {
-		fmt.Printf("Error creating directory: %s\n", err)
+		return fmt.Errorf("error creating directory: %w", err)
 	}
+	return nil
 }
 
-// ExitIfExists exits the program if the file already exists
+// ExitIfExists exits the program if the file already exists.
 func ExitIfExists(dir string) {
 	if _, err := os.Stat(dir); !os.IsNotExist(err) {
 		fmt.Println("Filechick detected that you already have this file downloaded. Exiting...")
@@ -102,12 +118,14 @@ func ExitIfExists(dir string) {
 	}
 }
 
-// SaveImage to file
-func SaveImage(url string, filename string) {
-
-	// filename = strings.Replace(filename, ".png", ".jpg", -1)
-
-	results, _ := http.Get(url)
+// SaveImage saves an image from a URL to a file.
+// Returns an error if the operation fails.
+func SaveImage(url string, filename string) error {
+	// Get the image
+	results, err := http.Get(url)
+	if err != nil {
+		return fmt.Errorf("error getting image: %w", err)
+	}
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
 		if err != nil {
@@ -115,41 +133,53 @@ func SaveImage(url string, filename string) {
 		}
 	}(results.Body)
 
-	emptyFile, _ := CreateEmptyFile(filename)
+	// Create an empty file
+	emptyFile, err := CreateEmptyFile(filename)
+	if err != nil {
+		return fmt.Errorf("error creating file: %w", err)
+	}
+	defer emptyFile.Close()
+
+	// Copy the image to the file
 	_, copyErr := io.Copy(emptyFile, results.Body)
 	if copyErr != nil {
-		fmt.Println("error copying file", copyErr)
+		return fmt.Errorf("error copying file: %w", copyErr)
 	}
+
+	return nil
 }
 
-// TitleToDirName converts a title to a directory name
+// TitleToDirName converts a title to a directory name.
+// Returns the directory name as a string.
 func TitleToDirName(title string) string {
 	reg, _ := regexp.Compile("[^a-zA-Z\\d]+")
 	return reg.ReplaceAllString(title, "")
 }
 
-// RemoveIfExists removes a file if it exists
+// RemoveIfExists removes a file if it exists.
+// Returns an error if the operation fails.
 func RemoveIfExists(path string) error {
 	exists, err := Afero.Exists(path)
 
 	if err != nil {
-		return err
+		return fmt.Errorf("error checking file existence: %w", err)
 	}
 
 	if exists {
 		err = Afero.Remove(path)
 		if err != nil {
-			return err
+			return fmt.Errorf("error removing file: %w", err)
 		}
 	}
 	return nil
 }
 
-// GetFileNames returns a slice of strings containing all the file names in a directory
+// GetFileNames returns a slice of strings containing all the file names in a directory.
+// Returns an error if the operation fails.
 func GetFileNames(dir string) ([]string, error) {
 	files, err := Afero.ReadDir(dir)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error reading directory: %w", err)
 	}
 	var fileNames []string
 	for _, file := range files {
@@ -158,38 +188,42 @@ func GetFileNames(dir string) ([]string, error) {
 	return fileNames, nil
 }
 
-// FileOrDirExists checks if a file or directory exists
+// FileOrDirExists checks if a file or directory exists.
+// Returns true if the file or directory exists, false otherwise.
 func FileOrDirExists(path string) bool {
 	_, err := os.Stat(path)
 	return err == nil
 }
 
-// CopyFile copies a file
+// CopyFile copies a file from the source to the destination.
+// Returns an error if the operation fails.
 func CopyFile(src, dst string) error {
 	in, err := os.Open(src)
 	if err != nil {
-		return err
+		return fmt.Errorf("error opening source file: %w", err)
 	}
 	defer in.Close()
 
 	out, err := os.Create(dst)
 	if err != nil {
-		return err
+		return fmt.Errorf("error creating destination file: %w", err)
 	}
 	defer out.Close()
 
 	_, err = io.Copy(out, in)
 	if err != nil {
-		return err
+		return fmt.Errorf("error copying file: %w", err)
 	}
+
 	return out.Close()
 }
 
-// ReadFileLineByLine reads a file line by line
+// ReadFileLineByLine reads a file line by line.
+// Returns a slice of strings containing the file lines and an error if any.
 func ReadFileLineByLine(filePath string) ([]string, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error opening file: %w", err)
 	}
 	defer file.Close()
 
@@ -199,14 +233,15 @@ func ReadFileLineByLine(filePath string) ([]string, error) {
 		lines = append(lines, scanner.Text())
 	}
 	if err := scanner.Err(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error scanning file: %w", err)
 	}
 	return lines, nil
 }
 
-// VippyEnv to get environment variable
+// VippyEnv gets an environment variable value using viper.
+// Returns the value as a string.
 func VippyEnv(key string) string {
-	// use viper to get bot key from environment variable
+	// Use viper to get the value from the environment variable
 	vippy := viper.New()
 	vippy.SetConfigName(".env")
 	vippy.SetConfigType("env")
@@ -217,6 +252,5 @@ func VippyEnv(key string) string {
 	if err != nil {
 		log.Fatal("Error reading env file: ", err)
 	}
-	key = vippy.GetString(key)
-	return key
+	return vippy.GetString(key)
 }
