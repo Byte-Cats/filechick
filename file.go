@@ -39,14 +39,14 @@ func DeleteFile(file string) error {
 // Returns an error if the operation fails.
 func SaveHtml(url string, fileName string) error {
 	// Validate URL
-	if _, err := url.ParseRequestURI(url); err != nil {
+	if _, err := regexp.Compile(url); err != nil { // Changed from http.ParseRequestURI to regexp.Compile
 		return fmt.Errorf("invalid URL: %w", err)
 	}
 
 	// Create the file
-	file, err := CreateFile(fileName)
-	if err != nil {
-		return fmt.Errorf("error creating file: %w", err)
+	file := CreateFile(fileName) // Changed to only assign the file
+	if file == nil {
+		return fmt.Errorf("error creating file") // Updated error handling
 	}
 	defer file.Close()
 
