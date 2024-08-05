@@ -1,8 +1,10 @@
 package filechick
 
 import (
+	"context"
 	"fmt"
 	"io"
+	"log"
 	"math/rand"
 	"net/http"
 	"time"
@@ -19,39 +21,41 @@ var UserAgents = []string{
 
 // RandomizeUserAgent randomizes the user agent
 func RandomizeUserAgent() string {
-	rand.Seed(time.Now().UnixNano())
-	return UserAgents[rand.Intn(len(UserAgents))]
+	// Create a new random source
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	return UserAgents[r.Intn(len(UserAgents))]
 }
 
-// ApplyUserAgent function to apply the user agent to a http request
+// ApplyUserAgent applies the user agent to an HTTP request
 func ApplyUserAgent(req *http.Request) {
 	req.Header.Add("User-Agent", RandomizeUserAgent())
 }
 
-// CustomRequest makes a HTTP GET request with a randomized user agent
-func CustomRequest(url string) (string, error) {
-	req, err := http.NewRequest("GET", url, nil)
+// CustomRequest makes an HTTP GET request with a randomized user agent
+func CustomRequest(ctx context.Context, url string, client *http.Client) (string, error) {
+	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
-		return "", fmt.Errorf("error creating request: %v", err)
+		return "", fmt.Errorf("error creating request: %w", err)
 	}
 	ApplyUserAgent(req)
-	client := &http.Client{}
+
 	resp, err := client.Do(req)
 	if err != nil {
-		return "", fmt.Errorf("error making request: %v", err)
+		return "", fmt.Errorf("error making request: %w", err)
 	}
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			fmt.Println("Error closing body:", err)
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			log.Println("Error closing body:", err)
 		}
-	}(resp.Body)
+	}()
+
 	if resp.StatusCode != http.StatusOK {
 		return "", fmt.Errorf("request failed with status code %d", resp.StatusCode)
 	}
+
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", fmt.Errorf("error reading body: %v", err)
+		return "", fmt.Errorf("error reading body: %w", err)
 	}
 	return string(body), nil
 }

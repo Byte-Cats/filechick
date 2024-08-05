@@ -10,18 +10,24 @@ import (
 	chart "github.com/wcharczuk/go-chart"
 
 	"github.com/skip2/go-qrcode"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
-// GenerateQR generates a QR code with the given size, filename and content
-func GenerateQR(size int, filename string, content string) {
-	// Create a new QR code with the given content
-	qr, err := qrcode.New(content, qrcode.Medium)
+// QRConfig is the configuration for generating a QR code.
+type QRConfig struct {
+	Size     int
+	FileName string
+	Content  string
+}
+
+// GenerateQRCode generates a QR code with the specified configuration.
+func GenerateQRCode(config QRConfig) error {
+	qr, err := qrcode.New(config.Content, qrcode.Medium)
 	if err != nil {
-		fmt.Println(err)
-		return
+		return fmt.Errorf("failed to create QR code: %w", err)
 	}
-	// Write the QR code to the given file
-	qr.WriteFile(size, filename)
+	return qr.WriteFile(config.Size, config.FileName)
 }
 
 // GenerateLotteryNumbers generates a slice of unique integers from 1 to num.
@@ -69,8 +75,8 @@ func contains(s []int, e int) bool {
 // chars is a string containing all the characters that are allowed in the generated password.
 // Returns the generated password.
 func GeneratePassword(length int, chars string) string {
-	// Seed the random number generator.
-	rand.Seed(time.Now().UnixNano())
+	// Create a new random generator.
+	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	// Initialize a string builder with a capacity of length.
 	sb := strings.Builder{}
@@ -79,7 +85,7 @@ func GeneratePassword(length int, chars string) string {
 	// Generate length random characters from the chars string.
 	for i := 0; i < length; i++ {
 		// Generate a random index into the chars string.
-		idx := rand.Intn(len(chars))
+		idx := rng.Intn(len(chars))
 
 		// Append the character at the generated index to the string builder.
 		sb.WriteByte(chars[idx])
@@ -94,8 +100,8 @@ func GeneratePassword(length int, chars string) string {
 // chars is a string containing all the characters that are allowed in the generated business name.
 // Returns the generated business name.
 func GenerateName(length int, chars string) string {
-	// Seed the random number generator.
-	rand.Seed(time.Now().UnixNano())
+	// Create a new random generator.
+	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	// Initialize a string builder with a capacity of length.
 	sb := strings.Builder{}
@@ -104,14 +110,14 @@ func GenerateName(length int, chars string) string {
 	// Generate length random characters from the chars string.
 	for i := 0; i < length; i++ {
 		// Generate a random index into the chars string.
-		idx := rand.Intn(len(chars))
+		idx := rng.Intn(len(chars))
 
 		// Append the character at the generated index to the string builder.
 		sb.WriteByte(chars[idx])
 	}
 
-	// Convert the first character of the resulting string to uppercase.
-	name := strings.Title(sb.String())
+	// Convert the first character of the resulting string to uppercase using the new method.
+	name := cases.Title(language.English, cases.NoLower).String(sb.String())
 
 	// Return the resulting business name.
 	return name

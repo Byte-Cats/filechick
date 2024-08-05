@@ -2,6 +2,7 @@ package filechick
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"io"
 	"log"
@@ -51,7 +52,8 @@ func SaveHtml(url string, fileName string) error {
 	defer file.Close()
 
 	// Get HTML content
-	res, reqErr := CustomRequest(url)
+	ctx := context.Background()                            // Create a context
+	res, reqErr := CustomRequest(ctx, url, &http.Client{}) // Updated to include context and http.Client
 	if reqErr != nil {
 		return fmt.Errorf("error getting HTML from URL: %w", reqErr)
 	}
